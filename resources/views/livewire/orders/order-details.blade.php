@@ -1,453 +1,301 @@
 <div>
     @if($showModal)
-        <!-- Modal Overlay -->
-        <div class="fixed inset-0 z-50 overflow-y-auto" x-data="{ open: true }" x-show="open"
-            x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
-            x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
-            x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4" style="background:rgba(0,0,0,0.85);" x-data="{ show: @entangle('showModal') }" x-show="show" x-cloak>
+            <div class="card-dark" style="width:100%;max-width:1000px;padding:0;overflow:hidden;max-height:90vh;display:flex;flex-direction:column;" @click.outside="show = false">
 
-            <!-- Background Overlay -->
-            <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity" wire:click="closeModal"></div>
-
-            <!-- Modal Content -->
-            <div class="flex min-h-screen items-center justify-center p-4">
-                <div class="relative w-full max-w-5xl bg-white rounded-2xl shadow-2xl transform transition-all"
-                    x-transition:enter="transition ease-out duration-300"
-                    x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                    x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-                    x-transition:leave="transition ease-in duration-200"
-                    x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                    x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                    @click.away="$wire.closeModal()">
-
-                    <!-- Header -->
-                    <div
-                        class="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-indigo-50">
-                        <div>
-                            <h2 class="text-2xl font-bold text-gray-900">Order Details</h2>
-                            <p class="text-sm text-gray-600 mt-1">Order #{{ $this->order->order_number }}</p>
+                {{-- Header --}}
+                <div style="background:linear-gradient(135deg,rgba(13,148,136,0.15),rgba(15,118,110,0.1));padding:24px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+                    <div style="display:flex;align-items:center;gap:16px;">
+                        <div style="width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,#0d9488,#0f766e);display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 0 20px rgba(13,148,136,0.3);">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                         </div>
-                        <button wire:click="closeModal" class="text-gray-400 hover:text-gray-600 transition-colors">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
+                        <div>
+                            <h2 style="font-size:1.5rem;font-weight:700;color:#f9fafb;margin:0;">Order Details</h2>
+                            <p style="color:#2dd4bf;font-size:0.9rem;margin:0;font-weight:600;">Order #{{ $this->order->order_number }}</p>
+                        </div>
                     </div>
+                    <button @click="show = false" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#94a3b8;border-radius:10px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:0.2s;" onmouseover="this.style.background='rgba(244,63,94,0.15)';this.style.color='#f43f5e'" onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.color='#94a3b8'">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                </div>
 
-                    <!-- Content -->
-                    <div class="px-6 py-6 max-h-[calc(100vh-200px)] overflow-y-auto">
-                        <!-- Flash Messages -->
-                        @if (session()->has('success'))
-                            <div class="mb-4 p-4 bg-green-100 border border-green-200 text-green-700 rounded-lg">
-                                {{ session('success') }}
-                            </div>
-                        @endif
+                {{-- Body --}}
+                <div style="padding:24px;overflow-y:auto;flex-grow:1;" class="custom-scrollbar">
+                    
+                    @if (session()->has('success'))
+                        <div class="alert-success" style="margin-bottom:20px;">{{ session('success') }}</div>
+                    @endif
+                    @if (session()->has('error'))
+                        <div class="alert-error" style="margin-bottom:20px;">{{ session('error') }}</div>
+                    @endif
 
-                        @if (session()->has('error'))
-                            <div class="mb-4 p-4 bg-red-100 border border-red-200 text-red-700 rounded-lg">
-                                {{ session('error') }}
-                            </div>
-                        @endif
+                    <div style="display:grid;grid-template-columns:2fr 1fr;gap:24px;">
+                        
+                        {{-- Left Column --}}
+                        <div style="display:flex;flex-direction:column;gap:24px;">
+                            
+                            {{-- Order Information Card --}}
+                            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:20px;padding:24px;">
+                                <h3 style="font-size:1.1rem;font-weight:700;color:#f9fafb;display:flex;align-items:center;gap:10px;margin:0 0 20px 0;">
+                                    <svg style="width:20px;height:20px;color:#0d9488;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                    Order Information
+                                </h3>
 
-                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                            <!-- Left Column: Order Info & Customer -->
-                            <div class="lg:col-span-2 space-y-6">
-                                <!-- Order Information -->
-                                <div class="bg-white border border-gray-200 rounded-lg p-5">
-                                    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                                        <svg class="w-5 h-5 text-purple-600 mr-2" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                        </svg>
-                                        Order Information
-                                    </h3>
-                                    <div class="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <p class="text-sm text-gray-500">Order Number</p>
-                                            <p class="text-base font-semibold text-gray-900">
-                                                {{ $this->order->order_number }}</p>
-                                        </div>
-                                        <div>
-                                            <p class="text-sm text-gray-500">Order Date</p>
-                                            <p class="text-base font-semibold text-gray-900">
-                                                {{ $this->order->created_at->format('d M Y, h:i A') }}</p>
-                                        </div>
-                                        <div>
-                                            <p class="text-sm text-gray-500">Delivery Date</p>
-                                            <p class="text-base font-semibold text-gray-900">
-                                                {{ \Carbon\Carbon::parse($this->order->delivery_date)->format('d M Y') }}
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <p class="text-sm text-gray-500">Payment Method</p>
-                                            <p class="text-base font-semibold text-gray-900 capitalize">
-                                                {{ $this->order->payment_method ? str_replace('_', ' ', $this->order->payment_method) : 'Not Paid' }}</p>
-                                        </div>
-                                        <div>
-                                            <p class="text-sm text-gray-500">Status</p>
-                                            <span
-                                                class="inline-flex px-3 py-1 text-xs font-semibold rounded-full {{ $this->getStatusColor($this->order->status) }}">
-                                                {{ ucfirst($this->order->status) }}
-                                            </span>
-                                        </div>
-                                        <div>
-                                            <p class="text-sm text-gray-500">Payment Status</p>
-                                            <span
-                                                class="inline-flex px-3 py-1 text-xs font-semibold rounded-full {{ $this->getPaymentStatusColor($this->order->payment_status) }}">
-                                                {{ ucfirst($this->order->payment_status) }}
-                                            </span>
-                                        </div>
+                                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;">
+                                    <div>
+                                        <p style="color:#94a3b8;font-size:0.75rem;font-weight:600;text-transform:uppercase;margin:0 0 4px 0;">Order Number</p>
+                                        <p style="color:#f9fafb;font-size:1rem;font-weight:600;margin:0;">{{ $this->order->order_number }}</p>
                                     </div>
-                                    
-                                    {{-- Order Notes Section --}}
-                                    <div class="mt-4 pt-4 border-t border-gray-200">
-                                        <div class="flex items-center justify-between mb-2">
-                                            <p class="text-sm font-semibold text-gray-700">Order Notes</p>
-                                            @if(!$editingNotes)
-                                                <button wire:click="toggleEditNotes" 
-                                                    class="text-xs text-purple-600 hover:text-purple-800 font-medium flex items-center">
-                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                    </svg>
-                                                    Edit Notes
-                                                </button>
-                                            @endif
-                                        </div>
-                                        
-                                        @if($editingNotes)
-                                            <div class="space-y-2">
-                                                <textarea wire:model="orderNotes" rows="4"
-                                                    placeholder="Add notes for this order (optional)"
-                                                    class="w-full rounded-lg border-2 border-gray-300 px-3 py-2 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-200"></textarea>
-                                                <div class="flex items-center gap-2">
-                                                    <button wire:click="saveNotes"
-                                                        class="px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors">
-                                                        Save Notes
-                                                    </button>
-                                                    <button wire:click="toggleEditNotes"
-                                                        class="px-4 py-2 bg-gray-200 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-300 transition-colors">
-                                                        Cancel
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        @else
-                                            @if($this->order->notes)
-                                                <p class="text-sm text-gray-900 mt-1 whitespace-pre-wrap">{{ $this->order->notes }}</p>
-                                            @else
-                                                <p class="text-sm text-gray-400 italic mt-1">No notes added yet</p>
-                                            @endif
-                                        @endif
+                                    <div>
+                                        <p style="color:#94a3b8;font-size:0.75rem;font-weight:600;text-transform:uppercase;margin:0 0 4px 0;">Order Date</p>
+                                        <p style="color:#f9fafb;font-size:0.9rem;margin:0;">{{ $this->order->created_at->format('d M Y, h:i A') }}</p>
+                                    </div>
+                                    <div>
+                                        <p style="color:#94a3b8;font-size:0.75rem;font-weight:600;text-transform:uppercase;margin:0 0 4px 0;">Delivery Date</p>
+                                        <p style="color:#f9fafb;font-size:0.9rem;margin:0;">{{ \Carbon\Carbon::parse($this->order->delivery_date)->format('d M Y') }}</p>
+                                    </div>
+                                    <div>
+                                        <p style="color:#94a3b8;font-size:0.75rem;font-weight:600;text-transform:uppercase;margin:0 0 4px 0;">Payment Method</p>
+                                        <p style="color:#f9fafb;font-size:0.9rem;margin:0;text-transform:capitalize;">{{ $this->order->payment_method ? str_replace('_', ' ', $this->order->payment_method) : 'Not Paid' }}</p>
+                                    </div>
+                                    <div>
+                                        <p style="color:#94a3b8;font-size:0.75rem;font-weight:600;text-transform:uppercase;margin:0 0 4px 0;">Order Status</p>
+                                        <span class="badge {{ $this->order->status === 'pending' ? 'badge-pending' : ($this->order->status === 'processing' ? 'badge-processing' : ($this->order->status === 'ready' ? 'badge-ready' : 'badge-delivered')) }}">
+                                            {{ ucfirst($this->order->status) }}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <p style="color:#94a3b8;font-size:0.75rem;font-weight:600;text-transform:uppercase;margin:0 0 4px 0;">Payment Status</p>
+                                        <span class="badge {{ $this->order->payment_status === 'paid' ? 'badge-paid' : ($this->order->payment_status === 'partial' ? 'badge-processing' : 'badge-unpaid') }}">
+                                            {{ ucfirst($this->order->payment_status) }}
+                                        </span>
                                     </div>
                                 </div>
 
-                                <!-- Customer Information -->
-                                <div class="bg-white border border-gray-200 rounded-lg p-5">
-                                    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                                        <svg class="w-5 h-5 text-purple-600 mr-2" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                        </svg>
-                                        Customer Information
-                                    </h3>
-                                    <div class="space-y-3">
-                                        <div class="flex items-center">
-                                            <svg class="w-5 h-5 text-gray-400 mr-3" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                            </svg>
-                                            <div>
-                                                <p class="text-sm text-gray-500">Name</p>
-                                                <p class="text-base font-semibold text-gray-900">
-                                                    {{ $this->order->customer->name }}</p>
-                                            </div>
-                                        </div>
-                                        @if($this->order->customer->phone)
-                                            <div class="flex items-center">
-                                                <svg class="w-5 h-5 text-gray-400 mr-3" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                                                </svg>
-                                                <div>
-                                                    <p class="text-sm text-gray-500">Phone</p>
-                                                    <p class="text-base font-semibold text-gray-900">
-                                                        {{ $this->order->customer->phone }}</p>
-                                                </div>
-                                            </div>
-                                        @endif
-                                        @if($this->order->customer->address)
-                                            <div class="flex items-start">
-                                                <svg class="w-5 h-5 text-gray-400 mr-3 mt-1" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                </svg>
-                                                <div>
-                                                    <p class="text-sm text-gray-500">Address</p>
-                                                    <p class="text-base text-gray-900">{{ $this->order->customer->address }}</p>
-                                                </div>
-                                            </div>
-                                        @endif
-                                        <div class="flex items-center pt-3 border-t border-gray-200">
-                                            <span class="text-sm text-gray-500">Total Orders:</span>
-                                            <span
-                                                class="ml-2 font-semibold text-gray-900">{{ $this->order->customer->total_orders }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Order Items -->
-                                <div class="bg-white border border-gray-200 rounded-lg p-5">
-                                    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                                        <svg class="w-5 h-5 text-purple-600 mr-2" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                                        </svg>
-                                        Order Items
-                                    </h3>
-                                    <div class="overflow-x-auto">
-                                        <table class="min-w-full divide-y divide-gray-200">
-                                            <thead class="bg-gray-50">
-                                                <tr>
-                                                    <th
-                                                        class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                                        Service</th>
-                                                    <th
-                                                        class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
-                                                        Type</th>
-                                                    <th
-                                                        class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
-                                                        Finish</th>
-                                                    <th
-                                                        class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
-                                                        Qty</th>
-                                                    <th
-                                                        class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">
-                                                        Price</th>
-                                                    <th
-                                                        class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">
-                                                        Subtotal</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody class="bg-white divide-y divide-gray-200">
-                                                @foreach($this->order->orderItems as $item)
-                                                    <tr>
-                                                        <td class="px-4 py-3 text-sm text-gray-900">{{ $item->service->name }}
-                                                        </td>
-                                                        <td class="px-4 py-3 text-center">
-                                                            <span
-                                                                class="inline-flex px-2 py-1 text-xs font-semibold rounded {{ $item->service_type === 'urgent' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800' }}">
-                                                                {{ ucfirst($item->service_type) }}
-                                                            </span>
-                                                        </td>
-                                                        <td class="px-4 py-3 text-center">
-                                                            <span
-                                                                class="inline-flex px-2 py-1 text-xs font-semibold rounded {{ $item->finish_type === 'hanger' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700' }}">
-                                                                {{ $item->finish_type === 'hanger' ? '👔 Hanger' : '📦 Fold' }}
-                                                            </span>
-                                                        </td>
-                                                        <td class="px-4 py-3 text-center text-sm text-gray-900">
-                                                            {{ $item->quantity }}</td>
-                                                        <td class="px-4 py-3 text-right text-sm text-gray-900">QAR
-                                                            {{ number_format($item->unit_price, 2) }}</td>
-                                                        <td class="px-4 py-3 text-right text-sm font-semibold text-gray-900">QAR
-                                                            {{ number_format($item->subtotal, 2) }}</td>
-                                                    </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Right Column: Summary & Actions -->
-                            <div class="space-y-6">
-                                <!-- Order Summary -->
-                                <div
-                                    class="bg-gradient-to-br from-purple-50 to-indigo-50 border border-purple-200 rounded-lg p-5">
-                                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Order Summary</h3>
-                                    <div class="space-y-3">
-                                        <div class="flex justify-between text-sm">
-                                            <span class="text-gray-600">Subtotal</span>
-                                            <span class="font-semibold text-gray-900">QAR
-                                                {{ number_format($this->order->orderItems->sum('subtotal'), 2) }}</span>
-                                        </div>
-                                        @if($this->order->discount > 0)
-                                            <div class="flex justify-between text-sm">
-                                                <span class="text-gray-600">Discount</span>
-                                                <span class="font-semibold text-red-600">- QAR
-                                                    {{ number_format($this->order->discount, 2) }}</span>
-                                            </div>
-                                        @endif
-                                        @if($this->order->tax > 0)
-                                            <div class="flex justify-between text-sm">
-                                                <span class="text-gray-600">Tax</span>
-                                                <span class="font-semibold text-gray-900">QAR
-                                                    {{ number_format($this->order->tax, 2) }}</span>
-                                            </div>
-                                        @endif
-                                        <div class="pt-3 border-t border-purple-200">
-                                            <div class="flex justify-between">
-                                                <span class="text-base font-semibold text-gray-900">Total Amount</span>
-                                                <span class="text-lg font-bold text-purple-600">QAR
-                                                    {{ number_format($this->order->total_amount, 2) }}</span>
-                                            </div>
-                                        </div>
-                                        <div class="flex justify-between text-sm">
-                                            <span class="text-gray-600">Payment Method</span>
-                                            @if($this->order->payment_method)
-                                                <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold
-                                                            @if($this->order->payment_method === 'cash') bg-emerald-100 text-emerald-800
-                                                            @else bg-indigo-100 text-indigo-800
-                                                            @endif">
-                                                    @if($this->order->payment_method === 'cash')
-                                                        <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                                                        </svg>
-                                                    @else
-                                                        <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                                                        </svg>
-                                                    @endif
-                                                    {{ strtoupper($this->order->payment_method) }}
-                                                </span>
-                                            @else
-                                                <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold bg-gray-100 text-gray-600">
-                                                    NOT PAID
-                                                </span>
-                                            @endif
-                                        </div>
-                                        <div class="pt-3 border-t border-purple-200">
-                                            <div class="flex justify-between items-center mb-2">
-                                                <span class="text-base font-semibold text-gray-900">Payment Status</span>
-                                                <span class="text-lg font-bold 
-                                                    @if($this->order->payment_status === 'paid') text-green-600
-                                                    @elseif($this->order->payment_status === 'partial') text-orange-600
-                                                    @else text-red-600
-                                                    @endif">
-                                                    {{ strtoupper($this->order->payment_status) }}
-                                                </span>
-                                            </div>
-                                            
-                                            {{-- Toggle Payment Status Button --}}
-                                            <button wire:click="togglePaymentStatus" 
-                                                class="w-full mt-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200
-                                                    @if($this->order->payment_status === 'paid')
-                                                        bg-red-100 text-red-700 hover:bg-red-200 border border-red-300
-                                                    @else
-                                                        bg-green-100 text-green-700 hover:bg-green-200 border border-green-300
-                                                    @endif">
-                                                @if($this->order->payment_status === 'paid')
-                                                    🔓 Mark as Unpaid
-                                                @else
-                                                    💰 Mark as Paid
-                                                @endif
+                                {{-- Order Notes --}}
+                                <div style="margin-top:20px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.06);">
+                                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+                                        <p style="color:#f9fafb;font-size:0.9rem;font-weight:600;margin:0;">Order Notes</p>
+                                        @if(!$editingNotes)
+                                            <button wire:click="toggleEditNotes" style="background:none;border:none;color:#0d9488;cursor:pointer;font-size:0.8rem;font-weight:600;display:flex;align-items:center;gap:4px;">
+                                                <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                                Edit Notes
                                             </button>
-                                        </div>
+                                        @endif
                                     </div>
-                                </div>
 
-                                <!-- Status Workflow -->
-                                @if($this->order->status !== 'delivered')
-                                    <div class="bg-white border border-gray-200 rounded-lg p-5">
-                                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Update Status</h3>
-                                        <div class="space-y-2">
-                                            @php
-                                                $nextStatus = $this->getNextStatus($this->order->status);
-                                            @endphp
-                                            @if($nextStatus)
-                                                <button wire:click="updateStatus('{{ $nextStatus }}')"
-                                                    class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg">
-                                                    Move to {{ ucfirst($nextStatus) }}
-                                                </button>
-                                            @endif
-                                        </div>
-
-                                        <!-- Status Timeline -->
-                                        <div class="mt-6 pt-6 border-t border-gray-200">
-                                            <p class="text-sm font-medium text-gray-700 mb-3">Status Progress</p>
-                                            <div class="space-y-2">
-                                                @foreach(['pending', 'processing', 'ready', 'delivered'] as $status)
-                                                    <div class="flex items-center">
-                                                        @if($this->order->status === $status)
-                                                            <div class="w-3 h-3 bg-purple-600 rounded-full"></div>
-                                                            <span
-                                                                class="ml-3 text-sm font-semibold text-purple-600">{{ ucfirst($status) }}</span>
-                                                        @elseif(array_search($status, ['pending', 'processing', 'ready', 'delivered']) < array_search($this->order->status, ['pending', 'processing', 'ready', 'delivered']))
-                                                            <div class="w-3 h-3 bg-green-500 rounded-full"></div>
-                                                            <span class="ml-3 text-sm text-gray-500">{{ ucfirst($status) }}</span>
-                                                        @else
-                                                            <div class="w-3 h-3 bg-gray-300 rounded-full"></div>
-                                                            <span class="ml-3 text-sm text-gray-400">{{ ucfirst($status) }}</span>
-                                                        @endif
-                                                    </div>
-                                                @endforeach
+                                    @if($editingNotes)
+                                        <div style="display:flex;flex-direction:column;gap:12px;">
+                                            <textarea wire:model="orderNotes" rows="3" class="input-dark" placeholder="Add notes for this order..."></textarea>
+                                            <div style="display:flex;gap:8px;">
+                                                <button wire:click="saveNotes" class="btn-primary" style="padding:6px 12px;font-size:0.8rem;">Save Notes</button>
+                                                <button wire:click="toggleEditNotes" class="btn-secondary" style="padding:6px 12px;font-size:0.8rem;">Cancel</button>
                                             </div>
                                         </div>
-                                    </div>
-                                @endif
+                                    @else
+                                        @if($this->order->notes)
+                                            <p style="color:#e2e8f0;font-size:0.9rem;margin:0;white-space:pre-wrap;background:rgba(255,255,255,0.02);padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.05);">{{ $this->order->notes }}</p>
+                                        @else
+                                            <p style="color:#64748b;font-size:0.9rem;font-style:italic;margin:0;">No notes added yet</p>
+                                        @endif
+                                    @endif
+                                </div>
+                            </div>
 
-                                <!-- Payment History -->
-                                @if($this->order->payments->count() > 0)
-                                    <div class="bg-white border border-gray-200 rounded-lg p-5">
-                                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Payment History</h3>
-                                        <div class="space-y-3">
-                                            @foreach($this->order->payments as $payment)
-                                                <div
-                                                    class="flex justify-between items-start py-2 border-b border-gray-100 last:border-0">
-                                                    <div>
-                                                        <p class="text-sm font-semibold text-gray-900">QAR
-                                                            {{ number_format($payment->amount, 2) }}</p>
-                                                        <p class="text-xs text-gray-500 mt-1">
-                                                            {{ $payment->payment_date->format('d M Y') }}</p>
-                                                        <p class="text-xs text-gray-400 capitalize">
-                                                            {{ str_replace('_', ' ', $payment->payment_method) }}</p>
-                                                    </div>
+                            {{-- Customer Information Card --}}
+                            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:20px;padding:24px;">
+                                <h3 style="font-size:1.1rem;font-weight:700;color:#f9fafb;display:flex;align-items:center;gap:10px;margin:0 0 20px 0;">
+                                    <svg style="width:20px;height:20px;color:#0ea5e9;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                    Customer Information
+                                </h3>
+                                
+                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+                                    <div style="display:flex;align-items:center;gap:12px;">
+                                        <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#0ea5e9,#0284c7);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;">
+                                            {{ strtoupper(substr($this->order->customer->name, 0, 1)) }}
+                                        </div>
+                                        <div>
+                                            <p style="color:#94a3b8;font-size:0.75rem;font-weight:600;margin:0 0 2px 0;">Name</p>
+                                            <p style="color:#f9fafb;font-size:1rem;font-weight:600;margin:0;">{{ $this->order->customer->name }}</p>
+                                        </div>
+                                    </div>
+
+                                    @if($this->order->customer->phone)
+                                    <div>
+                                        <p style="color:#94a3b8;font-size:0.75rem;font-weight:600;margin:0 0 2px 0;">Phone</p>
+                                        <p style="color:#f9fafb;font-size:0.95rem;margin:0;">{{ $this->order->customer->phone }}</p>
+                                    </div>
+                                    @endif
+
+                                    @if($this->order->customer->address)
+                                    <div style="grid-column:1 / -1;">
+                                        <p style="color:#94a3b8;font-size:0.75rem;font-weight:600;margin:0 0 2px 0;">Address</p>
+                                        <p style="color:#f9fafb;font-size:0.95rem;margin:0;">{{ $this->order->customer->address }}</p>
+                                    </div>
+                                    @endif
+                                </div>
+                            </div>
+
+                            {{-- Order Items Table --}}
+                            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:20px;padding:24px;overflow-x:auto;">
+                                <h3 style="font-size:1.1rem;font-weight:700;color:#f9fafb;display:flex;align-items:center;gap:10px;margin:0 0 20px 0;">
+                                    <svg style="width:20px;height:20px;color:#f59e0b;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                                    Order Items
+                                </h3>
+
+                                <table class="table-dark" style="margin:0;">
+                                    <thead>
+                                        <tr>
+                                            <th>Service</th>
+                                            <th>Type</th>
+                                            <th>Finish</th>
+                                            <th style="text-align:center;">Qty</th>
+                                            <th style="text-align:right;">Price</th>
+                                            <th style="text-align:right;">Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($this->order->orderItems as $item)
+                                            <tr>
+                                                <td style="color:#f9fafb;font-weight:500;">{{ $item->service->name }}</td>
+                                                <td>
+                                                    <span class="badge {{ $item->service_type === 'urgent' ? 'badge-unpaid' : 'badge-processing' }}">
+                                                        {{ ucfirst($item->service_type) }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span class="badge badge-active" style="background:rgba(16,185,129,0.1);color:#10b981;">
+                                                        {{ $item->finish_type === 'hanger' ? '👔 Hanger' : '📦 Fold' }}
+                                                    </span>
+                                                </td>
+                                                <td style="text-align:center;color:#f9fafb;">{{ $item->quantity }}</td>
+                                                <td style="text-align:right;color:#cbd5e1;">QAR {{ number_format($item->unit_price, 2) }}</td>
+                                                <td style="text-align:right;color:#f59e0b;font-weight:600;">QAR {{ number_format($item->subtotal, 2) }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+
+                        {{-- Right Column --}}
+                        <div style="display:flex;flex-direction:column;gap:24px;">
+                            
+                            {{-- Order Summary --}}
+                            <div style="background:linear-gradient(135deg,rgba(13,148,136,0.1),rgba(15,118,110,0.05));border:1px solid rgba(13,148,136,0.2);border-radius:20px;padding:24px;">
+                                <h3 style="font-size:1.1rem;font-weight:700;color:#f9fafb;margin:0 0 20px 0;">Order Summary</h3>
+                                
+                                <div style="display:flex;flex-direction:column;gap:12px;">
+                                    <div style="display:flex;justify-content:space-between;color:#cbd5e1;font-size:0.9rem;">
+                                        <span>Subtotal</span>
+                                        <span style="color:#f9fafb;font-weight:600;">QAR {{ number_format($this->order->orderItems->sum('subtotal'), 2) }}</span>
+                                    </div>
+                                    @if($this->order->discount > 0)
+                                    <div style="display:flex;justify-content:space-between;color:#cbd5e1;font-size:0.9rem;">
+                                        <span>Discount</span>
+                                        <span style="color:#fb7185;font-weight:600;">- QAR {{ number_format($this->order->discount, 2) }}</span>
+                                    </div>
+                                    @endif
+                                    @if($this->order->tax > 0)
+                                    <div style="display:flex;justify-content:space-between;color:#cbd5e1;font-size:0.9rem;">
+                                        <span>Tax</span>
+                                        <span style="color:#f9fafb;font-weight:600;">QAR {{ number_format($this->order->tax, 2) }}</span>
+                                    </div>
+                                    @endif
+                                    
+                                    <div style="margin-top:8px;padding-top:16px;border-top:1px solid rgba(13,148,136,0.2);display:flex;justify-content:space-between;align-items:center;">
+                                        <span style="color:#f9fafb;font-weight:600;">Total Amount</span>
+                                        <span style="color:#2dd4bf;font-size:1.5rem;font-weight:700;">QAR {{ number_format($this->order->total_amount, 2) }}</span>
+                                    </div>
+
+                                    <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(13,148,136,0.2);">
+                                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                                            <span style="color:#cbd5e1;font-size:0.9rem;">Payment Status</span>
+                                            <span class="badge {{ $this->order->payment_status === 'paid' ? 'badge-paid' : ($this->order->payment_status === 'partial' ? 'badge-processing' : 'badge-unpaid') }}" style="font-size:0.85rem;">
+                                                {{ strtoupper($this->order->payment_status) }}
+                                            </span>
+                                        </div>
+                                        <button wire:click="togglePaymentStatus" class="btn-primary" style="width:100%;justify-content:center;background:{{ $this->order->payment_status === 'paid' ? 'rgba(244,63,94,0.1)' : 'rgba(16,185,129,0.1)' }};color:{{ $this->order->payment_status === 'paid' ? '#fb7185' : '#34d399' }};border:1px solid {{ $this->order->payment_status === 'paid' ? 'rgba(244,63,94,0.3)' : 'rgba(16,185,129,0.3)' }};box-shadow:none;">
+                                            @if($this->order->payment_status === 'paid')
+                                                Mark as Unpaid
+                                            @else
+                                                Mark as Paid
+                                            @endif
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Status Workflow --}}
+                            @if($this->order->status !== 'delivered')
+                                <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:20px;padding:24px;">
+                                    <h3 style="font-size:1.1rem;font-weight:700;color:#f9fafb;margin:0 0 16px 0;">Update Status</h3>
+                                    
+                                    @php
+                                        $nextStatus = $this->getNextStatus($this->order->status);
+                                    @endphp
+                                    @if($nextStatus)
+                                        <button wire:click="updateStatus('{{ $nextStatus }}')" class="btn-primary" style="width:100%;justify-content:center;padding:12px;font-size:1rem;">
+                                            Move to {{ ucfirst($nextStatus) }}
+                                        </button>
+                                    @endif
+
+                                    <div style="margin-top:20px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.06);">
+                                        <p style="color:#94a3b8;font-size:0.8rem;font-weight:600;margin:0 0 12px 0;text-transform:uppercase;">Status Progress</p>
+                                        <div style="display:flex;flex-direction:column;gap:12px;">
+                                            @foreach(['pending', 'processing', 'ready', 'delivered'] as $status)
+                                                <div style="display:flex;align-items:center;gap:12px;">
+                                                    @if($this->order->status === $status)
+                                                        <div style="width:12px;height:12px;border-radius:50%;background:#0d9488;box-shadow:0 0 10px #0d9488;"></div>
+                                                        <span style="color:#2dd4bf;font-weight:600;font-size:0.9rem;">{{ ucfirst($status) }}</span>
+                                                    @elseif(array_search($status, ['pending', 'processing', 'ready', 'delivered']) < array_search($this->order->status, ['pending', 'processing', 'ready', 'delivered']))
+                                                        <div style="width:12px;height:12px;border-radius:50%;background:#10b981;"></div>
+                                                        <span style="color:#94a3b8;font-size:0.9rem;">{{ ucfirst($status) }}</span>
+                                                    @else
+                                                        <div style="width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,0.1);"></div>
+                                                        <span style="color:#64748b;font-size:0.9rem;">{{ ucfirst($status) }}</span>
+                                                    @endif
                                                 </div>
                                             @endforeach
                                         </div>
                                     </div>
-                                @endif
+                                </div>
+                            @endif
 
-                                <!-- Action Buttons -->
-                                <div class="bg-white border border-gray-200 rounded-lg p-5">
-                                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Actions</h3>
-                                    <div class="space-y-2">
-                                        <a href="{{ route('orders.receipt.print', $this->order->id) }}" target="_blank"
-                                            class="w-full bg-white hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg border border-gray-300 transition-colors flex items-center justify-center">
-                                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                                            </svg>
-                                            Print Receipt
-                                        </a>
-                                        <a href="{{ route('orders.receipt.download', $this->order->id) }}"
-                                            class="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center">
-                                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                            </svg>
-                                            Download PDF
-                                        </a>
+                            {{-- Payment History --}}
+                            @if($this->order->payments->count() > 0)
+                                <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:20px;padding:24px;">
+                                    <h3 style="font-size:1.1rem;font-weight:700;color:#f9fafb;margin:0 0 16px 0;">Payment History</h3>
+                                    <div style="display:flex;flex-direction:column;gap:12px;">
+                                        @foreach($this->order->payments as $payment)
+                                            <div style="display:flex;justify-content:space-between;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.06);last-child:border-bottom:none;">
+                                                <div>
+                                                    <p style="color:#f9fafb;font-size:0.9rem;font-weight:600;margin:0;">QAR {{ number_format($payment->amount, 2) }}</p>
+                                                    <p style="color:#64748b;font-size:0.75rem;margin:2px 0 0;">{{ $payment->payment_date->format('d M Y') }}</p>
+                                                </div>
+                                                <span class="badge badge-active" style="height:fit-content;text-transform:capitalize;">{{ str_replace('_', ' ', $payment->payment_method) }}</span>
+                                            </div>
+                                        @endforeach
                                     </div>
+                                </div>
+                            @endif
+
+                            {{-- Actions --}}
+                            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:20px;padding:24px;">
+                                <h3 style="font-size:1.1rem;font-weight:700;color:#f9fafb;margin:0 0 16px 0;">Actions</h3>
+                                <div style="display:flex;flex-direction:column;gap:12px;">
+                                    <a href="{{ route('orders.receipt.print', $this->order->id) }}" target="_blank" class="btn-secondary" style="justify-content:center;text-decoration:none;">
+                                        <svg style="width:18px;height:18px;margin-right:8px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                                        Print Receipt
+                                    </a>
+                                    <a href="{{ route('orders.receipt.download', $this->order->id) }}" class="btn-primary" style="justify-content:center;text-decoration:none;">
+                                        <svg style="width:18px;height:18px;margin-right:8px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                        Download PDF
+                                    </a>
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Footer -->
-                    <div class="flex items-center justify-end px-6 py-4 border-t border-gray-200 bg-gray-50 space-x-3">
-                        <button wire:click="closeModal"
-                            class="px-5 py-2 bg-white hover:bg-gray-50 text-gray-700 font-medium rounded-lg border border-gray-300 transition-colors">
-                            Close
-                        </button>
                     </div>
                 </div>
             </div>
@@ -456,104 +304,41 @@
 
     {{-- Payment Method Selection Modal --}}
     @if($showPaymentModal)
-        <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="payment-modal-title" role="dialog" aria-modal="true">
-            <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                <!-- Background overlay -->
-                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="closePaymentModal"></div>
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4" style="background:rgba(0,0,0,0.85);">
+            <div class="card-dark" style="width:100%;max-width:450px;padding:24px;text-align:center;">
+                <div style="width:64px;height:64px;border-radius:50%;background:rgba(16,185,129,0.1);color:#10b981;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+                    <svg style="width:32px;height:32px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                
+                <h3 style="font-size:1.2rem;font-weight:700;color:#f9fafb;margin:0 0 8px 0;">Select Payment Method</h3>
+                <p style="color:#94a3b8;font-size:0.9rem;margin:0 0 24px 0;">Order has been delivered. Please select the payment method used by customer.</p>
 
-                <!-- Modal panel -->
-                <div class="inline-block align-middle bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg sm:w-full">
-                    <div class="bg-white px-6 pt-6 pb-4">
-                        <div class="flex items-center mb-4">
-                            <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
-                                <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </div>
+                <div style="display:flex;flex-direction:column;gap:12px;text-align:left;">
+                    <label style="display:flex;align-items:center;gap:16px;padding:16px;background:{{ $selectedPaymentMethod === 'cash' ? 'rgba(16,185,129,0.1)' : 'rgba(255,255,255,0.02)' }};border:1px solid {{ $selectedPaymentMethod === 'cash' ? 'rgba(16,185,129,0.3)' : 'rgba(255,255,255,0.1)' }};border-radius:12px;cursor:pointer;transition:0.2s;">
+                        <input type="radio" wire:model="selectedPaymentMethod" value="cash" style="display:none;">
+                        <svg style="width:28px;height:28px;color:{{ $selectedPaymentMethod === 'cash' ? '#10b981' : '#64748b' }};" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                        <div>
+                            <p style="color:{{ $selectedPaymentMethod === 'cash' ? '#10b981' : '#f9fafb' }};font-size:1rem;font-weight:600;margin:0;">Cash Payment</p>
+                            <p style="color:{{ $selectedPaymentMethod === 'cash' ? 'rgba(16,185,129,0.8)' : '#64748b' }};font-size:0.8rem;margin:0;">Customer paid in cash</p>
                         </div>
-                        
-                        <h3 class="text-lg font-medium text-gray-900 text-center mb-4" id="payment-modal-title">
-                            Select Payment Method
-                        </h3>
-
-                        <p class="text-sm text-gray-500 text-center mb-6">
-                            Order has been delivered. Please select the payment method used by customer.
-                        </p>
-
-                        <!-- Payment Method Selection -->
-                        <div class="space-y-3">
-                            <label class="relative flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors
-                                {{ $selectedPaymentMethod === 'cash' ? 'border-green-500 bg-green-50' : 'border-gray-300' }}">
-                                <input type="radio" wire:model="selectedPaymentMethod" value="cash" class="sr-only">
-                                <div class="flex items-center flex-1">
-                                    <div class="flex-shrink-0">
-                                        <svg class="w-8 h-8 {{ $selectedPaymentMethod === 'cash' ? 'text-green-600' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                                        </svg>
-                                    </div>
-                                    <div class="ml-4">
-                                        <p class="text-base font-semibold {{ $selectedPaymentMethod === 'cash' ? 'text-green-900' : 'text-gray-900' }}">
-                                            Cash Payment
-                                        </p>
-                                        <p class="text-sm {{ $selectedPaymentMethod === 'cash' ? 'text-green-700' : 'text-gray-500' }}">
-                                            Customer paid in cash
-                                        </p>
-                                    </div>
-                                </div>
-                                @if($selectedPaymentMethod === 'cash')
-                                    <div class="flex-shrink-0">
-                                        <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                                        </svg>
-                                    </div>
-                                @endif
-                            </label>
-
-                            <label class="relative flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors
-                                {{ $selectedPaymentMethod === 'card' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-300' }}">
-                                <input type="radio" wire:model="selectedPaymentMethod" value="card" class="sr-only">
-                                <div class="flex items-center flex-1">
-                                    <div class="flex-shrink-0">
-                                        <svg class="w-8 h-8 {{ $selectedPaymentMethod === 'card' ? 'text-indigo-600' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                                        </svg>
-                                    </div>
-                                    <div class="ml-4">
-                                        <p class="text-base font-semibold {{ $selectedPaymentMethod === 'card' ? 'text-indigo-900' : 'text-gray-900' }}">
-                                            Card Payment
-                                        </p>
-                                        <p class="text-sm {{ $selectedPaymentMethod === 'card' ? 'text-indigo-700' : 'text-gray-500' }}">
-                                            Customer paid by card
-                                        </p>
-                                    </div>
-                                </div>
-                                @if($selectedPaymentMethod === 'card')
-                                    <div class="flex-shrink-0">
-                                        <svg class="w-6 h-6 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                                        </svg>
-                                    </div>
-                                @endif
-                            </label>
+                    </label>
+                    <label style="display:flex;align-items:center;gap:16px;padding:16px;background:{{ $selectedPaymentMethod === 'card' ? 'rgba(14,165,233,0.1)' : 'rgba(255,255,255,0.02)' }};border:1px solid {{ $selectedPaymentMethod === 'card' ? 'rgba(14,165,233,0.3)' : 'rgba(255,255,255,0.1)' }};border-radius:12px;cursor:pointer;transition:0.2s;">
+                        <input type="radio" wire:model="selectedPaymentMethod" value="card" style="display:none;">
+                        <svg style="width:28px;height:28px;color:{{ $selectedPaymentMethod === 'card' ? '#0ea5e9' : '#64748b' }};" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                        <div>
+                            <p style="color:{{ $selectedPaymentMethod === 'card' ? '#0ea5e9' : '#f9fafb' }};font-size:1rem;font-weight:600;margin:0;">Card Payment</p>
+                            <p style="color:{{ $selectedPaymentMethod === 'card' ? 'rgba(14,165,233,0.8)' : '#64748b' }};font-size:0.8rem;margin:0;">Customer paid by card</p>
                         </div>
+                    </label>
+                </div>
 
-                        <div class="mt-4 rounded-lg bg-yellow-50 p-3">
-                            <p class="text-xs text-yellow-800">
-                                <strong>Note:</strong> Total amount: <strong>{{ number_format($this->order->total_amount, 2) }} QAR</strong>
-                            </p>
-                        </div>
-                    </div>
+                <div style="margin-top:16px;padding:12px;background:rgba(245,158,11,0.1);border-radius:8px;">
+                    <p style="color:#f59e0b;font-size:0.85rem;margin:0;">Note: Total amount: <strong style="color:#fbbf24;">{{ number_format($this->order->total_amount, 2) }} QAR</strong></p>
+                </div>
 
-                    <div class="bg-gray-50 px-6 py-4 sm:flex sm:flex-row-reverse">
-                        <button type="button" wire:click="completePayment"
-                            class="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-6 py-3 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm">
-                            Complete Payment
-                        </button>
-                        <button type="button" wire:click="closePaymentModal"
-                            class="mt-3 w-full inline-flex justify-center rounded-lg border border-gray-300 shadow-sm px-6 py-3 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 sm:mt-0 sm:w-auto sm:text-sm">
-                            Cancel
-                        </button>
-                    </div>
+                <div style="display:flex;justify-content:center;gap:12px;margin-top:24px;">
+                    <button type="button" wire:click="closePaymentModal" class="btn-secondary" style="flex:1;justify-content:center;">Cancel</button>
+                    <button type="button" wire:click="completePayment" class="btn-primary" style="flex:1;justify-content:center;">Complete Payment</button>
                 </div>
             </div>
         </div>

@@ -1,245 +1,173 @@
 <div>
-    {{-- Simple Modal Without Alpine.js --}}
     @if($showModal)
-        <div class="fixed inset-0 z-50 overflow-y-auto bg-gray-900 bg-opacity-75" wire:click="closeModal">
-            <div class="flex items-center justify-center min-h-screen p-4">
-                <div wire:click.stop class="bg-white rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-y-auto">
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4" style="background:rgba(0,0,0,0.85);" wire:click="closeModal">
+            <div wire:click.stop class="w-full max-w-4xl max-h-[90vh] overflow-y-auto card-dark" style="background:#040c18;padding:0;">
 
-                    {{-- Header --}}
-                    <div class="bg-gradient-to-r from-purple-600 to-indigo-600 p-6 sticky top-0 z-10">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center space-x-4">
-                                <div class="h-16 w-16 rounded-full bg-white flex items-center justify-center shadow-lg">
-                                    <span class="text-2xl font-bold text-purple-600">
-                                        {{ strtoupper(substr($this->customer->name, 0, 1)) }}
-                                    </span>
-                                </div>
-                                <div>
-                                    <h2 class="text-2xl font-bold text-white">{{ $this->customer->name }}</h2>
-                                    <p class="text-purple-100">Customer Details</p>
-                                </div>
-                            </div>
-                            <button wire:click="closeModal"
-                                class="text-white hover:bg-white hover:bg-opacity-20 rounded-lg p-2">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
+                {{-- Header --}}
+                <div style="background:linear-gradient(135deg,rgba(13,148,136,0.15),rgba(15,118,110,0.1));padding:24px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;backdrop-filter:blur(10px);">
+                    <div style="display:flex;align-items:center;gap:16px;">
+                        <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#0d9488,#0f766e);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:bold;color:#fff;box-shadow:0 0 20px rgba(13,148,136,0.3);">
+                            {{ strtoupper(substr($this->customer->name, 0, 1)) }}
+                        </div>
+                        <div>
+                            <h2 style="font-size:1.5rem;font-weight:700;color:#f9fafb;margin:0;">{{ $this->customer->name }}</h2>
+                            <p style="color:#2dd4bf;font-size:0.9rem;margin:0;">Customer Profile</p>
                         </div>
                     </div>
+                    <button wire:click="closeModal" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#94a3b8;border-radius:10px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:0.2s;" onmouseover="this.style.background='rgba(244,63,94,0.15)';this.style.color='#f43f5e'" onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.color='#94a3b8'">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                </div>
 
-                    {{-- Body --}}
-                    <div class="p-6">
-                        
-                        {{-- Flash Messages --}}
-                        @if(session()->has('message'))
-                            <div class="mb-4 bg-green-50 border-l-4 border-green-500 p-4 rounded">
-                                <p class="text-green-800 font-medium">{{ session('message') }}</p>
-                            </div>
-                        @endif
-                        
-                        @if($errors->any())
-                            <div class="mb-4 bg-red-50 border-l-4 border-red-500 p-4 rounded">
-                                <p class="text-red-800 font-medium">Please fix the errors below</p>
-                            </div>
-                        @endif
+                {{-- Body --}}
+                <div style="padding:24px;">
+                    
+                    {{-- Flash Messages --}}
+                    @if(session()->has('message'))
+                        <div class="alert-success" style="margin-bottom:20px;">
+                            {{ session('message') }}
+                        </div>
+                    @endif
+                    
+                    @if($errors->any())
+                        <div class="alert-error" style="margin-bottom:20px;">
+                            Please fix the errors below
+                        </div>
+                    @endif
 
-                        {{-- Edit Mode Banner --}}
-                        @if($editMode)
-                            <div class="mb-6 bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-lg">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-3">
-                                        <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                        </svg>
-                                        <span class="font-semibold text-yellow-800">Edit Mode Active - Make changes and click Save</span>
+                    {{-- Edit Mode Banner --}}
+                    @if($editMode)
+                        <div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:12px;padding:16px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;">
+                            <div style="display:flex;align-items:center;gap:12px;">
+                                <svg style="width:24px;height:24px;color:#f59e0b;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                                <span style="font-weight:600;color:#fbbf24;">Edit Mode Active - Make changes and click Save</span>
+                            </div>
+                            <div style="display:flex;gap:12px;">
+                                <button type="button" wire:click="cancelEdit" class="btn-secondary">Cancel</button>
+                                <button type="button" wire:click="saveCustomer" class="btn-primary">Save Changes</button>
+                            </div>
+                        </div>
+                    @endif
+
+                    {{-- Customer Information Card --}}
+                    <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:20px;padding:24px;margin-bottom:24px;">
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+                            <h3 style="font-size:1.1rem;font-weight:700;color:#f9fafb;display:flex;align-items:center;gap:10px;margin:0;">
+                                <svg style="width:20px;height:20px;color:#0d9488;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                                Contact Information
+                            </h3>
+                            @if(!$editMode)
+                                <button type="button" wire:click="enableEdit" class="btn-secondary">
+                                    <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                                    Edit Details
+                                </button>
+                            @endif
+                        </div>
+
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+                            {{-- Customer Name --}}
+                            <div>
+                                <label style="display:block;color:#94a3b8;font-size:0.75rem;font-weight:600;text-transform:uppercase;margin-bottom:8px;">Customer Name *</label>
+                                @if($editMode)
+                                    <input type="text" wire:model="editName" class="input-dark">
+                                    @error('editName')<p style="margin-top:5px;font-size:0.8rem;color:#fb7185;">{{ $message }}</p>@enderror
+                                @else
+                                    <div style="font-size:1rem;font-weight:600;color:#f9fafb;padding:12px 16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);border-radius:12px;">
+                                        {{ $this->customer->name }}
                                     </div>
-                                    <div class="flex gap-2">
-                                        <button type="button" wire:click="saveCustomer"
-                                            class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold shadow-lg">
-                                            💾 Save Changes
-                                        </button>
-                                        <button type="button" wire:click="cancelEdit"
-                                            class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors font-semibold">
-                                            Cancel
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
-
-                        {{-- Customer Information Card --}}
-                        <div class="bg-gradient-to-br from-gray-50 to-white rounded-xl p-8 mb-6 border-2 border-gray-200 shadow-sm">
-                            <div class="flex items-center justify-between mb-6">
-                                <h3 class="text-2xl font-bold text-gray-800">👤 Customer Information</h3>
-                                @if(!$editMode)
-                                    <button type="button" wire:click="enableEdit"
-                                        class="px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors font-semibold flex items-center gap-2 shadow-lg">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                        </svg>
-                                        Edit Details
-                                    </button>
                                 @endif
                             </div>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {{-- Customer Name --}}
-                                <div>
-                                    <label class="block text-sm font-semibold text-gray-600 mb-2">
-                                        Customer Name *
-                                    </label>
-                                    @if($editMode)
-                                        <input type="text" wire:model="editName"
-                                            class="w-full text-lg px-4 py-3 border-2 {{ $errors->has('editName') ? 'border-red-500' : 'border-gray-300' }} rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-200" 
-                                            placeholder="Enter customer name" />
-                                        @error('editName')
-                                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                                        @enderror
-                                    @else
-                                        <div class="text-lg font-semibold text-gray-900 px-4 py-3 bg-gray-100 rounded-lg">
-                                            {{ $this->customer->name }}
-                                        </div>
-                                    @endif
-                                </div>
+                            {{-- Phone --}}
+                            <div>
+                                <label style="display:block;color:#94a3b8;font-size:0.75rem;font-weight:600;text-transform:uppercase;margin-bottom:8px;">Phone Number *</label>
+                                @if($editMode)
+                                    <input type="text" wire:model="editPhone" class="input-dark">
+                                    @error('editPhone')<p style="margin-top:5px;font-size:0.8rem;color:#fb7185;">{{ $message }}</p>@enderror
+                                @else
+                                    <div style="font-size:1rem;font-weight:600;color:#f9fafb;padding:12px 16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);border-radius:12px;">
+                                        {{ $this->customer->phone }}
+                                    </div>
+                                @endif
+                            </div>
 
-                                {{-- Phone --}}
-                                <div>
-                                    <label class="block text-sm font-semibold text-gray-600 mb-2">
-                                        Phone Number *
-                                    </label>
-                                    @if($editMode)
-                                        <input type="text" wire:model="editPhone"
-                                            class="w-full text-lg px-4 py-3 border-2 {{ $errors->has('editPhone') ? 'border-red-500' : 'border-gray-300' }} rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-200" 
-                                            placeholder="Enter phone number" />
-                                        @error('editPhone')
-                                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                                        @enderror
-                                    @else
-                                        <div class="text-lg font-semibold text-gray-900 px-4 py-3 bg-gray-100 rounded-lg">
-                                            {{ $this->customer->phone }}
-                                        </div>
-                                    @endif
-                                </div>
-
-                                {{-- Address --}}
-                                <div class="md:col-span-2">
-                                    <label class="block text-sm font-semibold text-gray-600 mb-2">
-                                        Address (Optional)
-                                    </label>
-                                    @if($editMode)
-                                        <textarea wire:model="editAddress" rows="2"
-                                            class="w-full text-lg px-4 py-3 border-2 {{ $errors->has('editAddress') ? 'border-red-500' : 'border-gray-300' }} rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-200" 
-                                            placeholder="Enter customer address"></textarea>
-                                        @error('editAddress')
-                                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                                        @enderror
-                                    @else
-                                        <div class="text-lg text-gray-900 px-4 py-3 bg-gray-100 rounded-lg">
-                                            {{ $this->customer->address ?? 'No address provided' }}
-                                        </div>
-                                    @endif
-                                </div>
+                            {{-- Address --}}
+                            <div style="grid-column:1 / -1;">
+                                <label style="display:block;color:#94a3b8;font-size:0.75rem;font-weight:600;text-transform:uppercase;margin-bottom:8px;">Address (Optional)</label>
+                                @if($editMode)
+                                    <textarea wire:model="editAddress" rows="2" class="input-dark" style="resize:vertical;"></textarea>
+                                    @error('editAddress')<p style="margin-top:5px;font-size:0.8rem;color:#fb7185;">{{ $message }}</p>@enderror
+                                @else
+                                    <div style="font-size:1rem;color:#e2e8f0;padding:12px 16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);border-radius:12px;">
+                                        {{ $this->customer->address ?? 'No address provided' }}
+                                    </div>
+                                @endif
                             </div>
                         </div>
+                    </div>
 
-                        {{-- Statistics Cards --}}
-                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-                            {{-- Total Orders --}}
-                            <div class="bg-white rounded-xl p-5 border-l-4 border-purple-500 shadow-sm">
-                                <p class="text-xs font-semibold text-gray-500 uppercase mb-1">Total Orders</p>
-                                <p class="text-3xl font-bold text-gray-900">{{ $this->statistics['total_orders'] }}</p>
-                            </div>
-
-                            {{-- Total Spent --}}
-                            <div class="bg-white rounded-xl p-5 border-l-4 border-green-500 shadow-sm">
-                                <p class="text-xs font-semibold text-gray-500 uppercase mb-1">Total Spent</p>
-                                <p class="text-3xl font-bold text-green-600">{{ number_format($this->statistics['total_spent'], 2) }}</p>
-                                <p class="text-xs text-gray-600">QAR</p>
-                            </div>
-
-                            {{-- Total Pending --}}
-                            <div class="bg-white rounded-xl p-5 border-l-4 border-red-500 shadow-sm">
-                                <p class="text-xs font-semibold text-gray-500 uppercase mb-1">Total Due</p>
-                                <p class="text-3xl font-bold text-red-600">{{ number_format($this->statistics['total_pending'], 2) }}</p>
-                                <p class="text-xs text-gray-600">QAR</p>
-                            </div>
+                    {{-- Statistics Cards --}}
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;">
+                        <div class="card-metric" style="border-left:4px solid #0d9488;">
+                            <p style="color:#94a3b8;font-size:0.75rem;font-weight:600;text-transform:uppercase;margin:0 0 8px;">Total Orders</p>
+                            <p style="color:#f9fafb;font-size:2rem;font-weight:700;margin:0;">{{ $this->statistics['total_orders'] }}</p>
                         </div>
+                        <div class="card-metric" style="border-left:4px solid #f59e0b;">
+                            <p style="color:#94a3b8;font-size:0.75rem;font-weight:600;text-transform:uppercase;margin:0 0 8px;">Total Spent</p>
+                            <p style="color:#fbbf24;font-size:2rem;font-weight:700;margin:0;">{{ number_format($this->statistics['total_spent'], 2) }}</p>
+                            <p style="color:#64748b;font-size:0.75rem;margin:4px 0 0;">QAR</p>
+                        </div>
+                        <div class="card-metric" style="border-left:4px solid #f43f5e;">
+                            <p style="color:#94a3b8;font-size:0.75rem;font-weight:600;text-transform:uppercase;margin:0 0 8px;">Total Due</p>
+                            <p style="color:#fb7185;font-size:2rem;font-weight:700;margin:0;">{{ number_format($this->statistics['total_pending'], 2) }}</p>
+                            <p style="color:#64748b;font-size:0.75rem;margin:4px 0 0;">QAR</p>
+                        </div>
+                    </div>
 
-                        {{-- Order History --}}
-                        <div class="bg-gray-50 rounded-xl p-6">
-                            <h3 class="text-xl font-bold text-gray-800 mb-4">📋 Order History</h3>
+                    {{-- Order History --}}
+                    <div>
+                        <h3 style="font-size:1.2rem;font-weight:700;color:#f9fafb;margin:0 0 16px;">Order History</h3>
 
-                            @if($this->customer->orders->count() > 0)
-                                <div class="space-y-3">
-                                    @foreach($this->customer->orders->sortByDesc('created_at')->take(10) as $order)
-                                        <div
-                                            class="bg-white rounded-lg p-4 border border-gray-200 hover:border-purple-300 transition-all">
-                                            <div class="flex items-center justify-between">
-                                                <div class="flex-1">
-                                                    <div class="flex items-center space-x-3 mb-2">
-                                                        <span
-                                                            class="text-base font-bold text-purple-600">#{{ $order->order_number }}</span>
-                                                        <span
-                                                            class="text-sm text-gray-500">{{ $order->created_at->format('M d, Y h:i A') }}</span>
-                                                    </div>
-                                                    <div class="flex items-center space-x-4 text-sm">
-                                                        <span class="text-gray-700">
-                                                            <strong>{{ $order->orderItems->count() }}</strong> items
-                                                        </span>
-                                                        <span
-                                                            class="inline-flex rounded-full px-3 py-1 text-xs font-bold
-                                                                    {{ $order->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : '' }}
-                                                                    {{ $order->status === 'processing' ? 'bg-blue-100 text-blue-800' : '' }}
-                                                                    {{ $order->status === 'ready' ? 'bg-purple-100 text-purple-800' : '' }}
-                                                                    {{ $order->status === 'delivered' ? 'bg-green-100 text-green-800' : '' }}">
-                                                            {{ ucfirst($order->status) }}
-                                                        </span>
-                                                        <span
-                                                            class="inline-flex rounded-full px-3 py-1 text-xs font-bold
-                                                                    {{ $order->payment_status === 'pending' ? 'bg-red-100 text-red-800' : '' }}
-                                                                    {{ $order->payment_status === 'paid' ? 'bg-green-100 text-green-800' : '' }}">
-                                                            {{ ucfirst($order->payment_status) }}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                                <div class="text-right">
-                                                    <p class="text-xl font-bold text-gray-900">
-                                                        {{ number_format($order->total_amount, 2) }}</p>
-                                                    <p class="text-xs text-gray-500">AED</p>
-                                                </div>
+                        @if($this->customer->orders->count() > 0)
+                            <div style="display:flex;flex-direction:column;gap:12px;">
+                                @foreach($this->customer->orders->sortByDesc('created_at')->take(10) as $order)
+                                    <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:16px;display:flex;align-items:center;justify-content:space-between;transition:0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)';this.style.borderColor='rgba(13,148,136,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.03)';this.style.borderColor='rgba(255,255,255,0.06)'">
+                                        <div>
+                                            <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+                                                <span style="font-size:1.1rem;font-weight:700;color:#2dd4bf;">#{{ $order->order_number }}</span>
+                                                <span style="font-size:0.85rem;color:#94a3b8;">{{ $order->created_at->format('M d, Y h:i A') }}</span>
+                                            </div>
+                                            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                                                <span style="font-size:0.85rem;color:#cbd5e1;"><strong>{{ $order->orderItems->count() }}</strong> items</span>
+                                                <span class="badge {{ $order->status === 'pending' ? 'badge-pending' : ($order->status === 'processing' ? 'badge-processing' : ($order->status === 'ready' ? 'badge-ready' : 'badge-delivered')) }}">
+                                                    {{ ucfirst($order->status) }}
+                                                </span>
+                                                <span class="badge {{ $order->payment_status === 'paid' ? 'badge-paid' : 'badge-unpaid' }}">
+                                                    {{ ucfirst($order->payment_status) }}
+                                                </span>
                                             </div>
                                         </div>
-                                    @endforeach
-                                </div>
-                            @else
-                                <div class="text-center py-12">
-                                    <div
-                                        class="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                        </svg>
+                                        <div style="text-align:right;">
+                                            <p style="font-size:1.2rem;font-weight:700;color:#f9fafb;margin:0;">{{ number_format($order->total_amount, 2) }}</p>
+                                            <p style="font-size:0.75rem;color:#94a3b8;margin:2px 0 0;">QAR</p>
+                                        </div>
                                     </div>
-                                    <p class="text-lg font-semibold text-gray-600">No Orders Yet</p>
-                                    <p class="text-sm text-gray-400 mt-1">This customer hasn't placed any orders</p>
-                                </div>
-                            @endif
-                        </div>
-                    </div>
-
-                    {{-- Footer --}}
-                    <div class="bg-gray-100 p-4 flex justify-end border-t">
-                        <button wire:click="closeModal"
-                            class="rounded-xl bg-gray-600 px-8 py-3 text-base font-bold text-white hover:bg-gray-700">
-                            ✕ Close
-                        </button>
+                                @endforeach
+                            </div>
+                        @else
+                            <div style="text-align:center;padding:40px;background:rgba(255,255,255,0.02);border:1px dashed rgba(255,255,255,0.1);border-radius:16px;">
+                                <svg style="width:48px;height:48px;color:#475569;margin:0 auto 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                <p style="font-size:1.1rem;font-weight:600;color:#e2e8f0;margin:0;">No Orders Yet</p>
+                                <p style="font-size:0.85rem;color:#94a3b8;margin:4px 0 0;">This customer hasn't placed any orders</p>
+                            </div>
+                        @endif
                     </div>
                 </div>
+
             </div>
         </div>
     @endif

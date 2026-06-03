@@ -1,255 +1,581 @@
-<div class="min-h-screen bg-gray-50 p-4">
-    {{-- Flash Messages --}}
-    @if (session()->has('success'))
-        <div class="mb-4 rounded-xl bg-green-50 border-l-4 border-green-500 p-4 text-green-800">
-            <div class="flex items-center">
-                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                        clip-rule="evenodd" />
-                </svg>
-                {{ session('success') }}
-            </div>
+<div class="w-full" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+
+    {{-- ===================== FLASH MESSAGES ===================== --}}
+    @if (session()->has('message'))
+        <div class="alert-success" style="
+            display: flex; align-items: center; gap: 12px;
+            margin: 0 0 20px 0; padding: 14px 20px;
+            background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(16,185,129,0.08));
+            border: 1px solid rgba(16,185,129,0.35); border-radius: 14px;
+            color: #6ee7b7; font-size: 0.875rem; font-weight: 500;">
+            <svg style="width:20px;height:20px;flex-shrink:0;color:#10b981;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span>{{ session('message') }}</span>
         </div>
     @endif
 
     @if (session()->has('error'))
-        <div class="mb-4 rounded-xl bg-red-50 border-l-4 border-red-500 p-4 text-red-800">
-            {{ session('error') }}
+        <div class="alert-error" style="
+            display: flex; align-items: center; gap: 12px;
+            margin: 0 0 20px 0; padding: 14px 20px;
+            background: linear-gradient(135deg, rgba(244,63,94,0.15), rgba(244,63,94,0.08));
+            border: 1px solid rgba(244,63,94,0.35); border-radius: 14px;
+            color: #fda4af; font-size: 0.875rem; font-weight: 500;">
+            <svg style="width:20px;height:20px;flex-shrink:0;color:#f43f5e;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span>{{ session('error') }}</span>
         </div>
     @endif
 
-    {{-- Simple Header --}}
-    <div class="mb-6 text-center">
-        <h1 class="text-4xl font-bold text-purple-600">👥 Customers</h1>
-        <p class="mt-2 text-lg text-gray-600">Manage your customer database</p>
+    {{-- ===================== PAGE HEADER ===================== --}}
+    <div style="
+        display: flex; align-items: center; justify-content: space-between;
+        flex-wrap: wrap; gap: 16px;
+        margin-bottom: 32px;">
+
+        {{-- Title Block --}}
+        <div style="display: flex; align-items: center; gap: 16px;">
+            {{-- Icon Badge --}}
+            <div style="
+                width: 52px; height: 52px; border-radius: 16px;
+                background: linear-gradient(135deg, #0d9488, #0891b2);
+                display: flex; align-items: center; justify-content: center;
+                box-shadow: 0 0 24px rgba(13,148,136,0.45);
+                flex-shrink: 0;">
+                <svg style="width:26px;height:26px;color:#fff;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                          d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+            </div>
+
+            <div>
+                <h1 style="
+                    font-size: 1.75rem; font-weight: 700; margin: 0;
+                    color: #f9fafb; letter-spacing: -0.02em; line-height: 1.2;">
+                    Customers
+                </h1>
+                <p style="margin: 2px 0 0 0; color: #64748b; font-size: 0.83rem; font-weight: 400;">
+                    Manage your customer base &amp; loyalty
+                </p>
+            </div>
+        </div>
+
+        {{-- Metrics + Add Button --}}
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+
+            {{-- Total Count Chip --}}
+            <div style="
+                display: flex; align-items: center; gap: 8px;
+                padding: 8px 16px; border-radius: 50px;
+                background: rgba(255,255,255,0.04);
+                border: 1px solid rgba(255,255,255,0.08);
+                color: #9ca3af; font-size: 0.82rem; font-weight: 500;">
+                <span style="
+                    width: 8px; height: 8px; border-radius: 50%;
+                    background: #0d9488;
+                    box-shadow: 0 0 8px rgba(13,148,136,0.7);
+                    display: inline-block;"></span>
+                {{ $this->customers->total() }} Total Customers
+            </div>
+
+            {{-- Add New Customer Button --}}
+            <button
+                wire:click="openCreateModal"
+                class="btn-primary"
+                style="
+                    display: inline-flex; align-items: center; gap: 8px;
+                    padding: 10px 22px; border-radius: 12px;
+                    background: linear-gradient(135deg, #0d9488, #0891b2);
+                    color: #fff; font-size: 0.875rem; font-weight: 600;
+                    border: none; cursor: pointer;
+                    box-shadow: 0 4px 20px rgba(13,148,136,0.4);
+                    transition: all 0.2s ease;
+                    white-space: nowrap;"
+                onmouseover="this.style.boxShadow='0 6px 28px rgba(13,148,136,0.6)'; this.style.transform='translateY(-1px)'"
+                onmouseout="this.style.boxShadow='0 4px 20px rgba(13,148,136,0.4)'; this.style.transform='translateY(0)'">
+                <svg style="width:18px;height:18px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                Add New Customer
+            </button>
+        </div>
     </div>
 
-    {{-- Search & Filter Card --}}
-    <div class="max-w-7xl mx-auto mb-6">
-        <div class="bg-white rounded-2xl shadow-lg p-6">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="md:col-span-2">
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
-                        </div>
-                        <input type="text" wire:model.live.debounce.300ms="search"
-                            placeholder="Search by name or phone number..."
-                            class="w-full rounded-xl border-2 border-gray-300 pl-12 pr-4 py-3 text-base focus:border-purple-500 focus:ring-2 focus:ring-purple-200" />
-                    </div>
+    {{-- ===================== SEARCH & FILTER BAR ===================== --}}
+    <div style="
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 20px; padding: 20px 24px;
+        margin-bottom: 24px;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        box-shadow: 0 4px 32px rgba(0,0,0,0.25);">
+
+        <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+
+            {{-- Search Input --}}
+            <div style="flex: 1; min-width: 260px; position: relative;">
+                <div style="
+                    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+                    color: #4b5563; pointer-events: none;">
+                    <svg style="width:17px;height:17px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
                 </div>
-                <div>
-                    <select wire:model.live="statusFilter"
-                        class="w-full rounded-xl border-2 border-gray-300 px-4 py-3 text-base focus:border-purple-500 focus:ring-2 focus:ring-purple-200">
-                        <option value="all">🔍 All Customers</option>
-                        <option value="active">✅ Active Only</option>
-                        <option value="inactive">❌ Inactive Only</option>
-                        <option value="regular">⭐ Regular Customers</option>
-                    </select>
+                <input
+                    wire:model.live.debounce.300ms="search"
+                    type="text"
+                    placeholder="Search by name, phone, or address…"
+                    class="input-dark"
+                    style="
+                        width: 100%; padding: 11px 14px 11px 42px;
+                        background: rgba(255,255,255,0.05);
+                        border: 1px solid rgba(255,255,255,0.09);
+                        border-radius: 12px; color: #f9fafb;
+                        font-size: 0.875rem; font-family: inherit;
+                        outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+                        box-sizing: border-box;"
+                    onfocus="this.style.borderColor='rgba(13,148,136,0.6)'; this.style.boxShadow='0 0 0 3px rgba(13,148,136,0.12)'"
+                    onblur="this.style.borderColor='rgba(255,255,255,0.09)'; this.style.boxShadow='none'"/>
+            </div>
+
+            {{-- Divider --}}
+            <div style="width:1px; height:36px; background: rgba(255,255,255,0.07); flex-shrink:0;"></div>
+
+            {{-- Status Filter --}}
+            <div style="position: relative; min-width: 180px;">
+                <div style="
+                    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+                    color: #4b5563; pointer-events: none; z-index: 1;">
+                    <svg style="width:15px;height:15px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/>
+                    </svg>
+                </div>
+                <select
+                    wire:model.live="statusFilter"
+                    class="select-dark"
+                    style="
+                        width: 100%; padding: 11px 36px 11px 38px;
+                        background: rgba(255,255,255,0.05);
+                        border: 1px solid rgba(255,255,255,0.09);
+                        border-radius: 12px; color: #f9fafb;
+                        font-size: 0.875rem; font-family: inherit;
+                        outline: none; appearance: none;
+                        cursor: pointer; transition: border-color 0.2s;
+                        box-sizing: border-box;"
+                    onfocus="this.style.borderColor='rgba(13,148,136,0.6)'"
+                    onblur="this.style.borderColor='rgba(255,255,255,0.09)'">
+                    <option value="" style="background:#0f172a;">All Status</option>
+                    <option value="1" style="background:#0f172a;">Active</option>
+                    <option value="0" style="background:#0f172a;">Inactive</option>
+                </select>
+                <div style="
+                    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+                    color: #4b5563; pointer-events: none;">
+                    <svg style="width:14px;height:14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
                 </div>
             </div>
 
-            <div class="mt-4 flex items-center justify-between">
-                <p class="text-sm text-gray-600">
-                    <strong>{{ $this->customers->total() }}</strong> customer(s) found
-                </p>
-                <button wire:click="openCreateModal"
-                    class="rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-3 text-base font-bold text-white hover:from-purple-700 hover:to-indigo-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all">
-                    ➕ Add New Customer
-                </button>
+            {{-- Legend chips --}}
+            <div style="display: flex; align-items: center; gap: 8px; margin-left: auto;">
+                <span style="
+                    display: inline-flex; align-items: center; gap: 6px;
+                    padding: 5px 12px; border-radius: 50px; font-size: 0.75rem;
+                    background: rgba(13,148,136,0.12); border: 1px solid rgba(13,148,136,0.25);
+                    color: #2dd4bf; font-weight: 500;">
+                    <span style="width:6px;height:6px;border-radius:50%;background:#10b981;display:inline-block;"></span>
+                    Active
+                </span>
+                <span style="
+                    display: inline-flex; align-items: center; gap: 6px;
+                    padding: 5px 12px; border-radius: 50px; font-size: 0.75rem;
+                    background: rgba(100,116,139,0.12); border: 1px solid rgba(100,116,139,0.25);
+                    color: #94a3b8; font-weight: 500;">
+                    <span style="width:6px;height:6px;border-radius:50%;background:#64748b;display:inline-block;"></span>
+                    Inactive
+                </span>
+                <span style="
+                    display: inline-flex; align-items: center; gap: 6px;
+                    padding: 5px 12px; border-radius: 50px; font-size: 0.75rem;
+                    background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.25);
+                    color: #fbbf24; font-weight: 500;">
+                    ★ Regular
+                </span>
             </div>
         </div>
     </div>
 
-    {{-- Customers List Layout --}}
-    <div class="max-w-7xl mx-auto">
-        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-            @forelse ($this->customers as $customer)
-                <div wire:key="customer-{{ $customer->id }}"
-                    class="border-b border-gray-200 hover:bg-purple-50 transition-colors duration-150">
-                    <div class="p-6">
-                        <div class="flex items-center justify-between">
-                            {{-- Left: Avatar + Info --}}
-                            <div class="flex items-center space-x-6 flex-1">
-                                {{-- Avatar --}}
-                                <div class="relative flex-shrink-0">
-                                    <div
-                                        class="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center shadow-lg">
-                                        <span class="text-2xl font-bold text-white">
-                                            {{ strtoupper(substr($customer->name, 0, 1)) }}
-                                        </span>
-                                    </div>
-                                    @if ($customer->isRegular)
-                                        <div class="absolute -top-1 -right-1 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center border-2 border-white"
-                                            title="Regular Customer">
-                                            <span class="text-xs">⭐</span>
-                                        </div>
-                                    @endif
+    {{-- ===================== CUSTOMER CARDS GRID ===================== --}}
+    @if ($this->customers->count() > 0)
+
+        <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px;">
+
+            @foreach ($this->customers as $customer)
+                <div
+                    wire:key="customer-{{ $customer->id }}"
+                    style="
+                        background: rgba(255,255,255,0.03);
+                        border: 1px solid rgba(255,255,255,0.06);
+                        border-radius: 18px; padding: 18px 22px;
+                        display: flex; align-items: center; gap: 18px;
+                        flex-wrap: wrap;
+                        transition: all 0.25s ease;
+                        position: relative; overflow: hidden;
+                        cursor: default;"
+                    onmouseover="
+                        this.style.background='rgba(13,148,136,0.07)';
+                        this.style.borderColor='rgba(13,148,136,0.3)';
+                        this.style.boxShadow='0 0 32px rgba(13,148,136,0.12), 0 4px 20px rgba(0,0,0,0.3)';
+                        this.style.transform='translateY(-1px)'"
+                    onmouseout="
+                        this.style.background='rgba(255,255,255,0.03)';
+                        this.style.borderColor='rgba(255,255,255,0.06)';
+                        this.style.boxShadow='none';
+                        this.style.transform='translateY(0)'">
+
+                    {{-- Decorative left accent bar --}}
+                    <div style="
+                        position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+                        background: {{ $customer->is_active ? 'linear-gradient(180deg, #0d9488, #06b6d4)' : 'linear-gradient(180deg, #374151, #1f2937)' }};
+                        border-radius: 3px 0 0 3px;">
+                    </div>
+
+                    {{-- Customer Number --}}
+                    <div style="
+                        font-size: 0.72rem; font-weight: 600; color: #4b5563;
+                        letter-spacing: 0.05em; min-width: 36px; text-align: center;
+                        padding-left: 8px;">
+                        #{{ $customer->customer_order_number ?? str_pad($loop->iteration, 3, '0', STR_PAD_LEFT) }}
+                    </div>
+
+                    {{-- Avatar Circle --}}
+                    <div style="position: relative; flex-shrink: 0;">
+                        <div style="
+                            width: 48px; height: 48px; border-radius: 14px;
+                            background: linear-gradient(135deg, #0d9488 0%, #0891b2 100%);
+                            display: flex; align-items: center; justify-content: center;
+                            font-size: 1.1rem; font-weight: 700; color: #fff;
+                            letter-spacing: -0.02em;
+                            box-shadow: 0 4px 16px rgba(13,148,136,0.35);
+                            position: relative;">
+                            {{ strtoupper(substr($customer->name, 0, 1)) }}{{ strtoupper(substr(strstr($customer->name, ' ') ?: ' x', 1, 1)) }}
+
+                            {{-- Regular Star Badge --}}
+                            @if ($customer->isRegular)
+                                <div style="
+                                    position: absolute; top: -6px; right: -6px;
+                                    width: 18px; height: 18px; border-radius: 50%;
+                                    background: linear-gradient(135deg, #f59e0b, #d97706);
+                                    display: flex; align-items: center; justify-content: center;
+                                    border: 2px solid #040c18;
+                                    box-shadow: 0 2px 8px rgba(245,158,11,0.5);
+                                    font-size: 9px; color: #fff; line-height: 1;">
+                                    ★
                                 </div>
-
-                                {{-- Customer Details --}}
-                                <div class="flex-1 min-w-0">
-                                    {{-- Name & Status --}}
-                                    <div class="flex items-center space-x-3 mb-2">
-                                        <h3 class="text-xl font-bold text-gray-900 truncate">{{ $customer->name }}</h3>
-                                        @if ($customer->is_active)
-                                            <span
-                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-800 border border-green-300">
-                                                ✓ Active
-                                            </span>
-                                        @else
-                                            <span
-                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-800 border border-gray-300">
-                                                ✗ Inactive
-                                            </span>
-                                        @endif
-                                    </div>
-
-                                    {{-- Contact Info Grid --}}
-                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        {{-- Phone --}}
-                                        <div class="flex items-center space-x-2">
-                                            <div
-                                                class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                                <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                                                </svg>
-                                            </div>
-                                            <div class="min-w-0">
-                                                <p class="text-xs text-gray-500">Phone</p>
-                                                <p class="text-sm font-semibold text-gray-900">{{ $customer->phone }}</p>
-                                                @if($customer->customer_order_number)
-                                                    <p class="text-xs text-gray-700 mt-1"><strong>Order ID:
-                                                            {{ $customer->customer_order_number }}</strong></p>
-                                                @endif
-                                            </div>
-                                        </div>
-
-                                        {{-- Address --}}
-                                        <div class="flex items-center space-x-2">
-                                            <div
-                                                class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                                <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                </svg>
-                                            </div>
-                                            <div class="min-w-0">
-                                                <p class="text-xs text-gray-500">Address</p>
-                                                <p class="text-sm font-semibold text-gray-900 truncate">
-                                                    {{ $customer->address ?? 'No address' }}</p>
-                                            </div>
-                                        </div>
-
-                                        {{-- Total Orders --}}
-                                        <div class="flex items-center space-x-2">
-                                            <div
-                                                class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                                <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                                                </svg>
-                                            </div>
-                                            <div class="min-w-0">
-                                                <p class="text-xs text-gray-500">Orders</p>
-                                                <p class="text-sm font-bold text-purple-600">{{ $customer->total_orders }}
-                                                    orders</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {{-- Right: Actions --}}
-                            <div class="flex items-center space-x-2 ml-6">
-                                <button wire:click="viewCustomer({{ $customer->id }})"
-                                    class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold text-sm transition-colors shadow-md hover:shadow-lg flex items-center space-x-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                    </svg>
-                                    <span>View</span>
-                                </button>
-
-                                <button wire:click="toggleStatus({{ $customer->id }})"
-                                    class="p-2.5 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded-lg transition-colors"
-                                    title="Toggle Status">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                                    </svg>
-                                </button>
-
-                                <button wire:click="deleteCustomer({{ $customer->id }})"
-                                    wire:confirm="Are you sure you want to delete this customer?"
-                                    class="p-2.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg transition-colors"
-                                    title="Delete Customer">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
-                                </button>
-                            </div>
+                            @endif
                         </div>
                     </div>
-                </div>
-            @empty
-                {{-- Empty State --}}
-                <div class="p-12 text-center">
-                    <div class="flex flex-col items-center">
-                        <div class="w-24 h-24 bg-purple-100 rounded-full flex items-center justify-center mb-6">
-                            <svg class="w-12 h-12 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                            </svg>
+
+                    {{-- Name + Regular Label --}}
+                    <div style="flex: 1; min-width: 160px;">
+                        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                            <span style="
+                                font-size: 0.975rem; font-weight: 650; color: #f9fafb;
+                                letter-spacing: -0.01em; line-height: 1.3;">
+                                {{ $customer->name }}
+                            </span>
+
+                            @if ($customer->isRegular)
+                                <span style="
+                                    display: inline-flex; align-items: center; gap: 4px;
+                                    padding: 2px 9px; border-radius: 50px;
+                                    background: rgba(245,158,11,0.14);
+                                    border: 1px solid rgba(245,158,11,0.3);
+                                    color: #fbbf24; font-size: 0.68rem; font-weight: 700;
+                                    letter-spacing: 0.04em; text-transform: uppercase;">
+                                    ★ Regular
+                                </span>
+                            @endif
+
+                            {{-- Status Badge --}}
+                            @if ($customer->is_active)
+                                <span class="badge badge-active" style="
+                                    display: inline-flex; align-items: center; gap: 4px;
+                                    padding: 2px 9px; border-radius: 50px;
+                                    background: rgba(13,148,136,0.14);
+                                    border: 1px solid rgba(13,148,136,0.3);
+                                    color: #2dd4bf; font-size: 0.68rem; font-weight: 600;
+                                    text-transform: uppercase; letter-spacing: 0.04em;">
+                                    <span style="width:5px;height:5px;border-radius:50%;background:#10b981;display:inline-block;"></span>
+                                    Active
+                                </span>
+                            @else
+                                <span class="badge" style="
+                                    display: inline-flex; align-items: center; gap: 4px;
+                                    padding: 2px 9px; border-radius: 50px;
+                                    background: rgba(100,116,139,0.12);
+                                    border: 1px solid rgba(100,116,139,0.25);
+                                    color: #94a3b8; font-size: 0.68rem; font-weight: 600;
+                                    text-transform: uppercase; letter-spacing: 0.04em;">
+                                    <span style="width:5px;height:5px;border-radius:50%;background:#475569;display:inline-block;"></span>
+                                    Inactive
+                                </span>
+                            @endif
                         </div>
-                        <h3 class="text-2xl font-bold text-gray-900 mb-2">No Customers Found</h3>
-                        <p class="text-gray-600 mb-6">Get started by adding your first customer to the system</p>
-                        <button wire:click="openCreateModal"
-                            class="rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-8 py-4 text-lg font-bold text-white hover:from-purple-700 hover:to-indigo-700 shadow-lg">
-                            ➕ Add First Customer
+
+                        {{-- Contact Info Row --}}
+                        <div style="display: flex; align-items: center; gap: 16px; margin-top: 5px; flex-wrap: wrap;">
+                            @if ($customer->phone)
+                                <span style="
+                                    display: inline-flex; align-items: center; gap: 5px;
+                                    color: #64748b; font-size: 0.8rem;">
+                                    <svg style="width:13px;height:13px;color:#0d9488;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                                    </svg>
+                                    {{ $customer->phone }}
+                                </span>
+                            @endif
+
+                            @if ($customer->address)
+                                <span style="
+                                    display: inline-flex; align-items: center; gap: 5px;
+                                    color: #64748b; font-size: 0.8rem;
+                                    max-width: 280px; white-space: nowrap;
+                                    overflow: hidden; text-overflow: ellipsis;">
+                                    <svg style="width:13px;height:13px;color:#0d9488;flex-shrink:0;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    </svg>
+                                    {{ Str::limit($customer->address, 40) }}
+                                </span>
+                            @endif
+                        </div>
+                    </div>
+
+                    {{-- Orders Stats --}}
+                    <div style="
+                        display: flex; align-items: center; gap: 6px;
+                        padding: 10px 16px;
+                        background: rgba(255,255,255,0.03);
+                        border: 1px solid rgba(255,255,255,0.06);
+                        border-radius: 12px; min-width: 110px; text-align: center;
+                        flex-direction: column;">
+                        <div style="
+                            font-size: 1.4rem; font-weight: 700; color: #f9fafb;
+                            line-height: 1; letter-spacing: -0.02em;">
+                            {{ $customer->total_orders ?? 0 }}
+                        </div>
+                        <div style="font-size: 0.7rem; color: #4b5563; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em;">
+                            Orders
+                        </div>
+                    </div>
+
+                    {{-- Action Buttons --}}
+                    <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
+
+                        {{-- View Button --}}
+                        <button
+                            wire:click="viewCustomer({{ $customer->id }})"
+                            title="View Customer Details"
+                            style="
+                                display: inline-flex; align-items: center; gap: 6px;
+                                padding: 8px 16px; border-radius: 10px;
+                                background: rgba(13,148,136,0.14);
+                                border: 1px solid rgba(13,148,136,0.28);
+                                color: #2dd4bf; font-size: 0.8rem; font-weight: 600;
+                                cursor: pointer; transition: all 0.2s ease;
+                                font-family: inherit;"
+                            onmouseover="this.style.background='rgba(13,148,136,0.28)'; this.style.boxShadow='0 0 14px rgba(13,148,136,0.3)'"
+                            onmouseout="this.style.background='rgba(13,148,136,0.14)'; this.style.boxShadow='none'">
+                            <svg style="width:15px;height:15px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                            View
+                        </button>
+
+                        {{-- Toggle Status Button --}}
+                        <button
+                            wire:click="toggleStatus({{ $customer->id }})"
+                            title="{{ $customer->is_active ? 'Deactivate Customer' : 'Activate Customer' }}"
+                            style="
+                                width: 36px; height: 36px; border-radius: 10px;
+                                display: inline-flex; align-items: center; justify-content: center;
+                                background: rgba(245,158,11,0.12);
+                                border: 1px solid rgba(245,158,11,0.25);
+                                color: #fbbf24; cursor: pointer; transition: all 0.2s ease;"
+                            onmouseover="this.style.background='rgba(245,158,11,0.25)'; this.style.boxShadow='0 0 12px rgba(245,158,11,0.3)'"
+                            onmouseout="this.style.background='rgba(245,158,11,0.12)'; this.style.boxShadow='none'">
+                            @if ($customer->is_active)
+                                <svg style="width:16px;height:16px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                                </svg>
+                            @else
+                                <svg style="width:16px;height:16px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            @endif
+                        </button>
+
+                        {{-- Delete Button --}}
+                        <button
+                            wire:click="deleteCustomer({{ $customer->id }})"
+                            wire:confirm="Are you sure you want to delete this customer? This action cannot be undone."
+                            title="Delete Customer"
+                            style="
+                                width: 36px; height: 36px; border-radius: 10px;
+                                display: inline-flex; align-items: center; justify-content: center;
+                                background: rgba(244,63,94,0.12);
+                                border: 1px solid rgba(244,63,94,0.25);
+                                color: #fb7185; cursor: pointer; transition: all 0.2s ease;"
+                            onmouseover="this.style.background='rgba(244,63,94,0.25)'; this.style.boxShadow='0 0 12px rgba(244,63,94,0.3)'"
+                            onmouseout="this.style.background='rgba(244,63,94,0.12)'; this.style.boxShadow='none'">
+                            <svg style="width:16px;height:16px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
                         </button>
                     </div>
+
                 </div>
-            @endforelse
+            @endforeach
         </div>
 
-        {{-- Pagination --}}
-        @if($this->customers->hasPages())
-            <div class="mt-6 bg-white rounded-2xl shadow-lg p-6">
-                {{ $this->customers->links() }}
+        {{-- ===================== PAGINATION ===================== --}}
+        @if ($this->customers->hasPages())
+            <div style="
+                padding: 16px 20px;
+                background: rgba(255,255,255,0.02);
+                border: 1px solid rgba(255,255,255,0.06);
+                border-radius: 16px;
+                display: flex; justify-content: center;">
+                <div style="color: #64748b;">
+                    {{ $this->customers->links() }}
+                </div>
             </div>
         @endif
-    </div>
 
-    {{-- Create Customer Modal --}}
-    @if ($showCreateModal)
-        <div class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-gray-900 bg-opacity-50 p-4">
-            <div class="w-full max-w-lg">
-                <livewire:customers.create-customer />
+    @else
+        {{-- ===================== EMPTY STATE ===================== --}}
+        <div style="
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 80px 40px;
+            background: rgba(255,255,255,0.02);
+            border: 1px dashed rgba(255,255,255,0.08);
+            border-radius: 24px; text-align: center;">
+
+            {{-- Glowing Icon --}}
+            <div style="
+                width: 90px; height: 90px; border-radius: 24px;
+                background: linear-gradient(135deg, rgba(13,148,136,0.15), rgba(8,145,178,0.15));
+                border: 1px solid rgba(13,148,136,0.2);
+                display: flex; align-items: center; justify-content: center;
+                margin-bottom: 24px;
+                box-shadow: 0 0 48px rgba(13,148,136,0.12);">
+                <svg style="width:42px;height:42px;color:#0d9488;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.3"
+                          d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+            </div>
+
+            <h3 style="
+                font-size: 1.25rem; font-weight: 700; color: #f9fafb;
+                margin: 0 0 10px 0; letter-spacing: -0.01em;">
+                No Customers Found
+            </h3>
+            <p style="
+                color: #4b5563; font-size: 0.875rem; margin: 0 0 28px 0;
+                max-width: 340px; line-height: 1.6;">
+                No customers match your current search or filter criteria. Try adjusting your filters or add a new customer to get started.
+            </p>
+
+            <button
+                wire:click="openCreateModal"
+                style="
+                    display: inline-flex; align-items: center; gap: 8px;
+                    padding: 11px 24px; border-radius: 12px;
+                    background: linear-gradient(135deg, #0d9488, #0891b2);
+                    color: #fff; font-size: 0.875rem; font-weight: 600;
+                    border: none; cursor: pointer;
+                    box-shadow: 0 4px 20px rgba(13,148,136,0.35);
+                    font-family: inherit; transition: all 0.2s ease;"
+                onmouseover="this.style.boxShadow='0 6px 28px rgba(13,148,136,0.55)'; this.style.transform='translateY(-1px)'"
+                onmouseout="this.style.boxShadow='0 4px 20px rgba(13,148,136,0.35)'; this.style.transform='translateY(0)'">
+                <svg style="width:17px;height:17px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                Add First Customer
+            </button>
+        </div>
+    @endif
+
+    {{-- ===================== CREATE CUSTOMER MODAL ===================== --}}
+    @if($showCreateModal)
+        <div style="
+            position: fixed; inset: 0; z-index: 50;
+            background: rgba(0,0,0,0.82);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            display: flex; align-items: center; justify-content: center;
+            padding: 20px;">
+            <div style="
+                background: #0b1628;
+                border: 1px solid rgba(255,255,255,0.08);
+                border-radius: 24px;
+                width: 100%; max-width: 640px;
+                max-height: 90vh; overflow-y: auto;
+                box-shadow: 0 25px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(13,148,136,0.08);
+                position: relative;">
+                {{-- Modal top accent --}}
+                <div style="
+                    height: 3px; border-radius: 24px 24px 0 0;
+                    background: linear-gradient(90deg, #0d9488, #0891b2, #0d9488);
+                    background-size: 200% 100%;"></div>
+                @livewire('customers.create-customer')
             </div>
         </div>
     @endif
 
-    {{-- Customer Details Modal --}}
+    {{-- ===================== CUSTOMER DETAILS MODAL ===================== --}}
     @if($showDetailsModal && $selectedCustomerId > 0)
-        <div wire:key="customer-details-{{ $selectedCustomerId }}">
-            @livewire('customers.customer-details', ['customerId' => $selectedCustomerId], key('customer-details-' . $selectedCustomerId))
+        <div style="
+            position: fixed; inset: 0; z-index: 50;
+            background: rgba(0,0,0,0.82);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            display: flex; align-items: center; justify-content: center;
+            padding: 20px;">
+            <div style="
+                background: #0b1628;
+                border: 1px solid rgba(255,255,255,0.08);
+                border-radius: 24px;
+                width: 100%; max-width: 720px;
+                max-height: 90vh; overflow-y: auto;
+                box-shadow: 0 25px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(13,148,136,0.08);
+                position: relative;">
+                {{-- Modal top accent --}}
+                <div style="
+                    height: 3px; border-radius: 24px 24px 0 0;
+                    background: linear-gradient(90deg, #0d9488, #06b6d4, #0d9488);
+                    background-size: 200% 100%;"></div>
+                @livewire('customers.customer-details', ['customerId' => $selectedCustomerId])
+            </div>
         </div>
     @endif
 
-    {{-- Edit Customer Modal --}}
+    {{-- ===================== EDIT CUSTOMER (Always Mounted) ===================== --}}
     @livewire('customers.edit-customer')
+
 </div>
